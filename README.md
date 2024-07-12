@@ -1,20 +1,24 @@
 # Dockerize a Solana Validator and Run a Mini Cluster
 
-## Requirements
+### Requirements
 1) Docker installed on your system
 2) A copy of Solana monorepo
 
+## Steps
+
+### Setup
 #### Build desired solana version
 ```
 cd solana
 cargo build --release
 ```
 
-### Create subnet for cluster:
+#### Create subnet for cluster:
 ```
 docker network create --driver=bridge --subnet=192.168.0.0/24 solana-cluster
 ```
 
+### Bootstrap Validator
 #### Setup docker configuration
 ```
 # run from within solana repo
@@ -74,6 +78,7 @@ docker exec -it <container-id> /bin/bash
 tail -f logs/solana-validator.log
 ```
 
+### Standard Validator
 #### Setup Standard Validator
 ```
 # from solana/
@@ -133,4 +138,30 @@ solana -ul gossip
 solana -ul validators
 ```
 
-Note: may take some time for validator to catch up to the bootstrap. so mayn not see both validators in `solana -ul validators` immediately.
+Note: may take some time for validator to catch up to the bootstrap. so may not see both validators in `solana -ul validators` immediately.
+
+### Docker tips
+1) Stop container:
+```
+docker stop <container-name>
+```
+2) Delete container name
+```
+docker rm <container-name>
+```
+3) If you need to push your container into a repo repository:
+  - Ensure you have a docker repository setup. You should have a default one under your docker username
+  - login to docker on the command line:
+```
+docker login
+# follow username/password prompts
+```
+  - In this case, your docker image must be of the format: 
+```
+<registry-name>/<container-name>:<tag>
+```
+  - Build your docker container as above
+  - Push it to your registry:
+```
+docker push <registry-name>/<container-name>:<tag>
+```
